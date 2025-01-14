@@ -2,15 +2,21 @@ from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers, status
-from simplybooksapi.models import Book, Author
+from simplybooksapi.models import Book, Author,Genre
 
 class BookView(ViewSet):
     """View for handling book requests"""
 
     def retrieve(self, request, pk):
         """Handle GET request for single book"""
+        uid = request.query_params.get('uid', None)
         try:
-            book = Book.objects.get(pk=pk)
+            if uid is None:
+                book = Book.objects.get(pk=pk)
+            else:
+                book = Book.objects.get(pk=pk, uid=uid)
+            genres = Genre.objects.filter(bookgenres__book_id=book)
+            book.genres=genres.all()
             serializer = BookSerializer(book)
             return Response(serializer.data)
         except Book.DoesNotExist as ex:
@@ -18,8 +24,9 @@ class BookView(ViewSet):
 
     def list(self, request):
         """Handle GET requests to get all books"""
-        posts = Book.objects.all()
-        serializer = BookSerializer(posts, many=True)
+        
+        books = Book.objects.all()
+        serializer = BookSerializer(books, many=True)
         return Response(serializer.data)
     def create(self, request):
         """Handle POST operations for creating a book"""
@@ -40,7 +47,6 @@ class BookView(ViewSet):
         """Handle PUT requests for updating a book"""
         author = Author.objects.get(pk=request.data["author_id"])
 
-        id = pk
         book = Book.objects.get(pk=pk)
         book.author=author
         book.title = request.data["title"]
@@ -60,12 +66,17 @@ class BookView(ViewSet):
         book = Book.objects.get(pk=pk)
         book.delete()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
-
+class GenreSerializer(serializers.ModelSerializer):
+  
+    class Meta:
+        model = Genre
+        fields = ('id', 'description')
+        depth = 1
 class BookSerializer(serializers.ModelSerializer):
     """JSON serializer for books"""
-
+    genres = GenreSerializer(read_only=True, many=True)
     class Meta:
         model = Book
         fields = ('id', 'author', 'title', 'image', 
-                  'price', 'sale', 'uid', 'description')
+                  'price', 'sale', 'uid', 'description', 'genres')
         depth = 1
