@@ -33,8 +33,8 @@ class GenreBookView(ViewSet):
         Returns
         Response -- JSON serialized genre instance
         """
-        bookId = Book.objects.get(pk=request.data["book"])
-        genreId = Genre.objects.get(pk=request.data["genre"])
+        bookId = Book.objects.get(pk=request.data["book_id"])
+        genreId = Genre.objects.get(pk=request.data["genre_id"])
 
         bookGenre = BookGenre.objects.create(
             book=bookId,

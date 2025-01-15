@@ -21,7 +21,6 @@ class AuthorView(ViewSet):
     def list(self, request):
         """Handle GET requests to get all authors"""
         uid = request.query_params.get('uid', None)
-        favorite = request.query_params.get('favorite', None)
         try:
             if uid is not None:
                 authors = authors.filter(uid=uid)
