@@ -24,10 +24,19 @@ class BookView(ViewSet):
 
     def list(self, request):
         """Handle GET requests to get all books"""
-        
-        books = Book.objects.all()
-        serializer = BookSerializer(books, many=True)
-        return Response(serializer.data)
+        uid = request.query_params.get('uid', None)
+        try:
+            if uid is not None:
+                books = books.filter(uid=uid)
+            else:
+                books = Book.objects.all()
+            for book in books:
+                genres = Genre.objects.filter(bookgenres__book_id=book)
+                book.genres=genres.all()
+            serializer = BookSerializer(books, many=True)
+            return Response(serializer.data)
+        except Book.DoesNotExist as ex:
+            return Response({'message': 'Check query'}, status=status.HTTP_400_BAD_REQUEST)
     def create(self, request):
         """Handle POST operations for creating a book"""
         author = Author.objects.get(pk=request.data["author_id"])

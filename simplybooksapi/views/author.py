@@ -8,8 +8,12 @@ class AuthorView(ViewSet):
     """View for handling author requests"""
     def retrieve(self, request, pk):
         """Handle GET requests for single authors"""
+        uid = request.query_params.get('uid', None)
         try:
-            author = Author.objects.get(pk=pk)
+            if uid is None:
+                author = Author.objects.get(pk=pk)
+            else:
+                author = Author.objects.get(pk=pk, uid=uid)
             serializer = SingleAuthorSerializer(author)
             return Response(serializer.data)
         except Author.DoesNotExist as ex:
@@ -18,10 +22,15 @@ class AuthorView(ViewSet):
         """Handle GET requests to get all authors"""
         uid = request.query_params.get('uid', None)
         favorite = request.query_params.get('favorite', None)
-        
-        authors = Author.objects.all()
-        serializer = AuthorSerializer(authors, many=True)
-        return Response(serializer.data)
+        try:
+            if uid is not None:
+                authors = authors.filter(uid=uid)
+            else:
+                authors = Author.objects.all()
+            serializer = AuthorSerializer(authors, many=True)
+            return Response(serializer.data)
+        except Author.DoesNotExist as ex:
+            return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
 
     def create(self, request):
         """Handle POST requests to get all authors"""

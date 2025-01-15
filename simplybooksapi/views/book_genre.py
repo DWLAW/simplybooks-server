@@ -23,8 +23,8 @@ class GenreBookView(ViewSet):
         Returns:
             Response -- JSON serialized list of genres
         """
-        bookGenre = BookGenre.objects.all()
-        serializer = GenreBookSerializer(bookGenre, many=True)
+        bookGenres = BookGenre.objects.all()
+        serializer = GenreBookSerializer(bookGenres, many=True)
         return Response(serializer.data)
   
   def create(self, request):
@@ -37,8 +37,8 @@ class GenreBookView(ViewSet):
         genreId = Genre.objects.get(pk=request.data["genre"])
 
         bookGenre = BookGenre.objects.create(
-            book_id=bookId,
-            genre_id=genreId,
+            book=bookId,
+            genre=genreId,
         )
         serializer = GenreBookSerializer(bookGenre)
         return Response(serializer.data)
@@ -66,5 +66,5 @@ class GenreBookSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = BookGenre
-        fields = ('id', 'book_id', 'genre_id' )
+        fields = ('id', 'book', 'genre' )
         depth = 1
