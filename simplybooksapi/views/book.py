@@ -30,9 +30,6 @@ class BookView(ViewSet):
                 books = books.filter(uid=uid)
             else:
                 books = Book.objects.all()
-            for book in books:
-                genres = Genre.objects.filter(bookgenres__book_id=book)
-                book.genres=genres.all()
             serializer = BookSerializer(books, many=True)
             return Response(serializer.data)
         except Book.DoesNotExist as ex:

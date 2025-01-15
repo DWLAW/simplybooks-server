@@ -70,12 +70,9 @@ class AuthorSerializer(serializers.ModelSerializer):
         fields = ('id', 'email', 'first_name', 'last_name', 'image', 'favorite', 'uid')
 
 class SingleAuthorSerializer(serializers.ModelSerializer):
-
-    book_count = serializers.IntegerField(default=None)
-
     class Meta:
         model = Author
         fields = ('id', 'email', 'first_name', 
                   'last_name', 'image', 'favorite', 
-                  'uid', 'book_count', 'books')
+                  'uid', 'books')
         depth = 1
