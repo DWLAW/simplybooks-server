@@ -3,7 +3,8 @@ from django.core.validators import MinValueValidator
 from .author import Author
 
 class Book(models.Model):
-
+    """Book model
+    """
     author = models.ForeignKey(Author, on_delete=models.CASCADE,
                                related_name='books')
     title = models.CharField(max_length=50)
